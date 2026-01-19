@@ -9,7 +9,9 @@ use crate::cpu::CPU;
 //  - Define libraries for the individual HW components
 //  - Complete GB struct definition
 
-pub struct Gameboy;
+pub struct Gameboy {
+    cpu: CPU    
+}
 
 impl Gameboy {
     pub fn load_rom(filepath: String) -> Result<(), Error> {
