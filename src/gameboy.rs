@@ -1,19 +1,18 @@
 use std::{
-    fs,
-    error
-}
+    fs::File,
+    io::Error
+};
 
 // TODO:
-//  - Define GB as a struct
 //  - Define libraries for the individual HW components
+//  - Complete GB struct definition
 
-pub struct Gameboy {
-
-}
+struct Gameboy;
 
 impl Gameboy {
-    pub fn load_rom(filepath: String) -> Result<String, String> {
-        Ok("ROM successfully loaded.".to_string())
+    pub fn load_rom(filepath: String) -> Result<(), io::Error> {
+        let file = File::open(filepath)?;
+        Ok(())
     }
 }
 
