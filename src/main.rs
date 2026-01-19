@@ -18,12 +18,15 @@ fn main() {
     }
     
     let rom_path = &args[1];
-    
     let gb = Gameboy::new();
+
+    println!("Loading ROM: {rom_path}");
     match gb.load_rom(rom_path) {
-        Ok(_) => {}
+        Ok(_) => {
+            println!("Successfully loaded ROM: {rom_path}");
+        }
         Err(e) => {
-            eprintln!("Failed to load rom: {e}");
+            eprintln!("[ERROR] Failed to load rom: {e}");
             process::exit(1);
         }
     }
