@@ -3,6 +3,7 @@ use std::{
 };
 
 mod gameboy;
+mod cpu;
 use gameboy::Gameboy;
     
 fn main() {

@@ -3,14 +3,16 @@ use std::{
     io::Error
 };
 
+use crate::cpu::CPU;
+
 // TODO:
 //  - Define libraries for the individual HW components
 //  - Complete GB struct definition
 
-struct Gameboy;
+pub struct Gameboy;
 
 impl Gameboy {
-    pub fn load_rom(filepath: String) -> Result<(), io::Error> {
+    pub fn load_rom(filepath: String) -> Result<(), Error> {
         let file = File::open(filepath)?;
         Ok(())
     }
