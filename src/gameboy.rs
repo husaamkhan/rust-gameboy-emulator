@@ -14,7 +14,11 @@ pub struct Gameboy {
 }
 
 impl Gameboy {
-    pub fn load_rom(filepath: String) -> Result<(), Error> {
+    pub fn new() -> Gameboy {
+        unimplemented!();
+    }
+
+    pub fn load_rom(&self, filepath: &str) -> Result<(), Error> {
         let file = File::open(filepath)?;
         Ok(())
     }

@@ -1,7 +1,7 @@
 pub struct CPU;
 
 impl CPU {
-    pub fn new() {
+    pub fn new() -> CPU {
         unimplemented!();
     }
 }
