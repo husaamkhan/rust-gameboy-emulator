@@ -15,7 +15,7 @@ pub struct Gameboy {
 
 impl Gameboy {
     pub fn new() -> Gameboy {
-        unimplemented!();
+        Gameboy { cpu: CPU::new() }
     }
 
     pub fn load_rom(&self, filepath: &str) -> Result<(), Error> {
