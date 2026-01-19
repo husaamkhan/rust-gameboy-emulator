@@ -18,7 +18,7 @@ fn main() {
     }
     
     let rom_path = &args[1];
-    let gb = Gameboy::new();
+    let mut gb = Gameboy::new();
 
     println!("Loading ROM: {rom_path}");
     match gb.load_rom(rom_path) {
