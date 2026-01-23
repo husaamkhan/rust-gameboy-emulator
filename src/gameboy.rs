@@ -1,14 +1,27 @@
 use std::{
     io::Read,
     fs::File,
-    io::Error
+    fmt
 };
 
 use crate::cpu::CPU;
 
-// TODO:
-//  - Define libraries for the individual HW components
-//  - Complete GB struct definition
+#[derive(Debug)]
+pub enum GameboyError {
+    EmptyRom,
+    IOError(std::io::Error)
+}
+
+impl std::error::Error for GameboyError {}
+
+impl fmt::Display for GameboyError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            GameboyError::EmptyRom => write!(f, "The ROM file is empty."),
+            GameboyError::IOError(err) => write!(f, "{err}")
+        }
+    }
+}
 
 pub struct Gameboy {
     rom: Vec<u8>,
@@ -20,15 +33,35 @@ impl Gameboy {
         Gameboy { rom: Vec::new(), cpu: CPU::new() }
     }
 
-    pub fn load_rom(&mut self, filepath: &str) -> Result<(), Error> {
-        let mut file = File::open(filepath)?;
+    pub fn load_rom(&mut self, filepath: &str) -> Result<(), GameboyError> {
+        let mut file = File::open(filepath).map_err(|err| GameboyError::IOError(err))?;
 
         let mut data: Vec<u8> = Vec::new();
-        file.read_to_end(&mut data)?;
+        file.read_to_end(&mut data).map_err(|err| GameboyError::IOError(err))?;
+
+        if data.is_empty() {
+            return Err(GameboyError::EmptyRom);
+        }
 
         self.rom = data;
         
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn load_rom_with_empty_file_path() { // todo add assertion
+        let mut gb = Gameboy { rom: Vec::new(), cpu: CPU::new()};
+
+        let filepath = "";
+        let result = gb.load_rom(filepath);
+        assert!(matches!(result, Err(GameboyError::IOError(e)) if e.kind() == std::io::ErrorKind::NotFound))
+    }
+}
+
+
 
