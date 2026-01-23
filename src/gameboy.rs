@@ -1,7 +1,8 @@
 use std::{
     io::Read,
     fs::File,
-    fmt
+    fmt,
+    io::Cursor
 };
 
 use crate::cpu::CPU;
@@ -35,9 +36,19 @@ impl Gameboy {
 
     pub fn load_rom(&mut self, filepath: &str) -> Result<(), GameboyError> {
         let mut file = File::open(filepath).map_err(|err| GameboyError::IOError(err))?;
+        self.read_rom_from_stream(&mut file)
+    }
 
+    /*
+     * Loads in data from a stream to rom
+     * Takes a stream to read in data (e.g std::fs::File)
+     *
+     * This approach of taking an open stream, rather than just opening+reading in from a file
+     * facilitates unit tests that do not interact with any actual files
+     */
+    fn read_rom_from_stream<Stream: std::io::Read>(&mut self, stream: &mut Stream) -> Result<(), GameboyError> {
         let mut data: Vec<u8> = Vec::new();
-        file.read_to_end(&mut data).map_err(|err| GameboyError::IOError(err))?;
+        stream.read_to_end(&mut data).map_err(|err| GameboyError::IOError(err))?;
 
         if data.is_empty() {
             return Err(GameboyError::EmptyRom);
