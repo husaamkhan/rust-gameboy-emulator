@@ -54,12 +54,17 @@ mod tests {
     use super::*;
 
     #[test]
-    fn load_rom_with_empty_file_path() { // todo add assertion
+    fn load_rom_with_empty_file_path() {
         let mut gb = Gameboy { rom: Vec::new(), cpu: CPU::new()};
 
         let filepath = "";
         let result = gb.load_rom(filepath);
-        assert!(matches!(result, Err(GameboyError::IOError(e)) if e.kind() == std::io::ErrorKind::NotFound))
+
+        assert!(matches!(
+                result,
+                Err(GameboyError::IOError(e)) if e.kind() == std::io::ErrorKind::NotFound));
+
+        assert_eq!(gb.rom.len(), 0);
     }
 }
 
