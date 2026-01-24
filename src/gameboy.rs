@@ -1,5 +1,4 @@
 use std::{
-    io::Read,
     fs::File,
     fmt,
     io::Cursor
@@ -36,19 +35,19 @@ impl Gameboy {
 
     pub fn load_rom(&mut self, filepath: &str) -> Result<(), GameboyError> {
         let mut file = File::open(filepath).map_err(|err| GameboyError::IOError(err))?;
-        self.read_rom_from_stream(&mut file)
+        self.read_rom_from_buffer(&mut file)
     }
 
     /*
-     * Loads in data from a stream to rom
-     * Takes a stream to read in data (e.g std::fs::File)
+     * Loads in data from a buffer to rom
+     * Takes a buffer to read in data (e.g std::fs::File)
      *
-     * This approach of taking an open stream, rather than just opening+reading in from a file
+     * This approach of taking an open buffer, rather than just opening+reading in from a file
      * facilitates unit tests that do not interact with any actual files
      */
-    fn read_rom_from_stream<Stream: std::io::Read>(&mut self, stream: &mut Stream) -> Result<(), GameboyError> {
+    fn read_rom_from_buffer<Buffer: std::io::Read>(&mut self, buffer: &mut Buffer) -> Result<(), GameboyError> {
         let mut data: Vec<u8> = Vec::new();
-        stream.read_to_end(&mut data).map_err(|err| GameboyError::IOError(err))?;
+        buffer.read_to_end(&mut data).map_err(|err| GameboyError::IOError(err))?;
 
         if data.is_empty() {
             return Err(GameboyError::EmptyRom);
@@ -65,17 +64,30 @@ mod tests {
     use super::*;
 
     #[test]
-    fn load_rom_with_empty_file_path() {
-        let mut gb = Gameboy { rom: Vec::new(), cpu: CPU::new()};
-
-        let filepath = "";
-        let result = gb.load_rom(filepath);
+    fn read_rom_from_buffer_empty() {
+        let mut gb = Gameboy::new();
+        let mut buffer = Cursor::new(Vec::new());
+        
+        let result = gb.read_rom_from_buffer(&mut buffer);
 
         assert!(matches!(
-                result,
-                Err(GameboyError::IOError(e)) if e.kind() == std::io::ErrorKind::NotFound));
-
+            result,
+            Err(GameboyError::EmptyRom)));
+        
         assert_eq!(gb.rom.len(), 0);
+    }
+
+    #[test]
+    fn read_rom_from_buffer_valid() {
+        let mut gb = Gameboy::new();
+
+        let data = vec![1, 2, 3, 4, 5];
+        let mut buffer = Cursor::new(&data);
+
+        let result = gb.read_rom_from_buffer(&mut buffer);
+        
+        assert!(matches!(result, Ok(())));
+        assert_eq!(gb.rom, data);
     }
 }
 
