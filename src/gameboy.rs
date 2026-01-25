@@ -6,9 +6,12 @@ use std::{
 
 use crate::cpu::CPU;
 
+const MAX_ROM_SIZE: usize = 8000;
+
 #[derive(Debug)]
 pub enum GameboyError {
     EmptyRom,
+    RomTooLarge,
     IOError(std::io::Error)
 }
 
@@ -18,6 +21,7 @@ impl fmt::Display for GameboyError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             GameboyError::EmptyRom => write!(f, "The ROM file is empty."),
+            GameboyError::RomTooLarge => write!(f, "The ROM file is too large."),
             GameboyError::IOError(err) => write!(f, "{err}")
         }
     }
@@ -51,6 +55,8 @@ impl Gameboy {
 
         if data.is_empty() {
             return Err(GameboyError::EmptyRom);
+        } else if data.len() > MAX_ROM_SIZE {
+            return Err(GameboyError::RomTooLarge);
         }
 
         self.rom = data;
@@ -78,6 +84,21 @@ mod tests {
     }
 
     #[test]
+    fn read_rom_from_buffer_rom_too_large() {
+        let mut gb = Gameboy::new();
+        let data: Vec<u8> = vec![0; MAX_ROM_SIZE+1];
+        let mut buffer = Cursor::new(data);
+        
+        let result = gb.read_rom_from_buffer(&mut buffer);
+
+        assert!(matches!(
+            result,
+            Err(GameboyError::RomTooLarge)));
+        
+        assert_eq!(gb.rom.len(), 0);
+}
+
+    #[test]
     fn read_rom_from_buffer_valid() {
         let mut gb = Gameboy::new();
 
@@ -86,6 +107,18 @@ mod tests {
 
         let result = gb.read_rom_from_buffer(&mut buffer);
         
+        assert!(matches!(result, Ok(())));
+        assert_eq!(gb.rom, data);
+    }
+
+    #[test]
+    fn read_rom_from_buffer_large_rom() {
+        let mut gb = Gameboy::new();
+        let data: Vec<u8> = vec![1; MAX_ROM_SIZE];
+        let mut buffer = Cursor::new(data.clone());
+        
+        let result = gb.read_rom_from_buffer(&mut buffer);
+
         assert!(matches!(result, Ok(())));
         assert_eq!(gb.rom, data);
     }
