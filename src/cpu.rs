@@ -1,3 +1,17 @@
+/**
+ * Contains all CPU registers.
+ *
+ * | 16-bit | Hi | Lo |   Name/Function   |
+ * |--------|----|----|-------------------|
+ * |   AF   | A  | -- |Accumulator & Flags|
+ * |   BC   | B  | C  |        BC         |
+ * |   DE   | D  | E  |        DE         |
+ * |   HL   | H  | L  |        HL         |
+ * |   SP   | -- | -- |   Stack Pointer   |
+ * |   PC   | -- | -- |  Program Counter  |
+ * From Gameboy Pandocs (https://gbdev.io/pandocs/CPU_Registers_and_Flags.html)
+ */
+#[derive(Debug, PartialEq)]
 struct Registers {
     a: u8,
     f: u8,
@@ -12,8 +26,8 @@ struct Registers {
 }
 
 /**
- * Contains bit masks that will be applied to register f (flag register) to get the values of various
- * flag bits.
+ * Contains bit masks that will be applied to CPU register f (flag register) to get the values of
+ * various flag bits.
  */
 struct FlagBitMasks;
 impl FlagBitMasks {
@@ -33,12 +47,16 @@ impl CPU {
         CPU { registers: r }
     }
 
-    fn initialize_registers(mut self, dmg_mode: bool, reg_b_value: u8) {
+    /**
+     * Initializes CPU registers based on whether the mode is set to CGB or DMG, and sets the B
+     * register value to the provided number
+     */
+    pub fn initialize_registers(&mut self, dmg_mode: bool, reg_b_value: u8) {
         self.registers.a = 0x11;
         self.registers.f = 0x80; // ZERO=1, SUBTRACT=0, HALF_CARRY=0, CARRY=0
         self.registers.b = reg_b_value;
         self.registers.c = 0x00;
-        self.registers.d = 0xff;
+        self.registers.d = 0xFF;
         self.registers.e = 0x56;
         self.registers.h = 0x00;
         self.registers.l = 0x0D;
@@ -57,6 +75,60 @@ impl CPU {
                 self.registers.l = 0x7C;
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn initialize_registers_cgb() {
+        let mut cpu = CPU::new();
+        cpu.initialize_registers(false, 0x00);
+
+        let reg = Registers {
+            a: 0x11, f: 0x80, b: 0x00, c: 0x00, d: 0xFF, e: 0x56, h: 0x00, l: 0x0D, pc: 0x0100, sp: 0xFFFE
+        };
+
+        assert_eq!(cpu.registers, reg);
+    }
+
+    #[test]
+    fn initialize_registers_dmg_case_one() {
+        let mut cpu = CPU::new();
+        cpu.initialize_registers(true, 0x43);
+
+        let reg = Registers {
+            a: 0x11, f: 0x80, b: 0x43, c: 0x00, d: 0x00, e: 0x08, h: 0x99, l: 0x1A, pc: 0x0100, sp: 0xFFFE
+        };
+
+        assert_eq!(cpu.registers, reg);
+    }
+
+
+    #[test]
+    fn initialize_registers_dmg_case_two() {
+        let mut cpu = CPU::new();
+        cpu.initialize_registers(true, 0x58);
+
+        let reg = Registers {
+            a: 0x11, f: 0x80, b: 0x58, c: 0x00, d: 0x00, e: 0x08, h: 0x99, l: 0x1A, pc: 0x0100, sp: 0xFFFE
+        };
+
+        assert_eq!(cpu.registers, reg);
+    }
+
+    #[test]
+    fn initialize_registers_dmg_case_three() {
+        let mut cpu = CPU::new();
+        cpu.initialize_registers(true, 0x11);
+
+        let reg = Registers {
+            a: 0x11, f: 0x80, b: 0x11, c: 0x00, d: 0x00, e: 0x08, h: 0x00, l: 0x7C, pc: 0x0100, sp: 0xFFFE
+        };
+
+        assert_eq!(cpu.registers, reg);
     }
 }
 
