@@ -52,6 +52,13 @@ impl CPU {
      * register value to the provided number
      */
     pub fn initialize_registers(&mut self, dmg_mode: bool, reg_b_value: u8) {
+
+        /*
+         * TODO: Instead of passing in reg_b_value, I should calculate the b register's initial
+         * value in this function. I can do this by instead passing in the old licensee and new
+         * licensee codes and calculating their sum in this function.
+         */
+
         self.registers.a = 0x11;
         self.registers.f = 0x80; // ZERO=1, SUBTRACT=0, HALF_CARRY=0, CARRY=0
         self.registers.b = reg_b_value;
