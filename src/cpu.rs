@@ -47,10 +47,6 @@ impl CPU {
         CPU { registers: r }
     }
 
-    /**
-     * Initializes CPU registers based on whether the mode is set to CGB or DMG, and sets the B
-     * register value to the provided number
-     */
     pub fn initialize_registers(&mut self, dmg_mode: bool) {
         self.registers.a = 0x11;
         self.registers.f = 0x80; // ZERO=1, SUBTRACT=0, HALF_CARRY=0, CARRY=0
@@ -69,6 +65,32 @@ impl CPU {
             self.registers.h = 0x00;
             self.registers.l = 0x7c;
         }
+    }
+
+    fn get_af(self) -> u16 {
+        ((self.registers.a as u16) << 8) | (self.registers.f as u16)
+    }
+
+    fn get_bc(self) -> u16 {
+        ((self.registers.b as u16) << 8) | (self.registers.c as u16)
+    }
+
+    fn get_de(self) -> u16 {
+        ((self.registers.d as u16) << 8) | (self.registers.e as u16)
+    }
+
+    fn get_hl(self) -> u16 {
+        ((self.registers.h as u16) << 8) | (self.registers.l as u16)
+    }
+
+
+    // Takes references to the upper and lower 8 bits of a register and assigns their value
+    fn set_registers(&mut self, upper_reg: &mut u8, lower_reg: &mut u8, value: u16) {
+        let value_upper = (value >> 8) as u8;
+        let value_lower = (value & 0x0F) as u8;
+
+        *upper_reg = value_upper;
+        *lower_reg = value_lower;
     }
 }
 
