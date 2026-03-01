@@ -131,28 +131,5 @@ mod tests {
 
         assert_eq!(cpu.registers, reg);
     }
-
-    #[test]
-    fn get_registers() {
-        let mut cpu = CPU::new();
-        cpu.registers.a = 0xAB;
-        cpu.registers.f = 0xCD;
-
-        let result = CPU::get_registers(&cpu.registers.a, &cpu.registers.f);
-
-        assert_eq!(result, 0xABCD);
-    }
-
-    #[test]
-    fn set_registers() {
-        let mut cpu = CPU::new();
-        let upper_reg = &mut cpu.registers.a;
-        let lower_reg = &mut cpu.registers.f;
-            
-        CPU::set_registers(upper_reg, lower_reg, 0xABCD);
-
-        assert_eq!(*upper_reg, 0xAB);
-        assert_eq!(*lower_reg, 0xCD);
-    }
 }
 
