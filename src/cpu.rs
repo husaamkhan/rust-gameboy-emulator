@@ -68,12 +68,12 @@ impl CPU {
     }
 
     /// Takes references to the upper and lower 8 bits of a register and returns their value
-    fn get_registers(&self, upper_reg: &u8, lower_reg: &u8) -> u16 {
+    fn get_registers(upper_reg: &u8, lower_reg: &u8) -> u16 {
         ((*upper_reg as u16) << 8) | (*lower_reg as u16)
     }
 
     /// Takes references to the upper and lower 8 bits of a register and assigns their value
-    fn set_registers(&mut self, upper_reg: &mut u8, lower_reg: &mut u8, value: u16) {
+    fn set_registers(upper_reg: &mut u8, lower_reg: &mut u8, value: u16) {
         let value_upper = (value >> 8) as u8;
         let value_lower = (value & 0x0F) as u8;
 
@@ -116,9 +116,21 @@ mod tests {
         cpu.registers.a = 0xAB;
         cpu.registers.f = 0xCD;
 
-        let result = cpu.get_registers(&cpu.registers.a, &cpu.registers.f);
+        let result = CPU::get_registers(&cpu.registers.a, &cpu.registers.f);
 
         assert_eq!(result, 0xABCD);
+    }
+
+    #[test]
+    fn set_registers() {
+        let mut cpu = CPU::new();
+        let upper_reg = &mut cpu.registers.a;
+        let lower_reg = &mut cpu.registers.f;
+            
+        CPU::set_registers(upper_reg, lower_reg, 0xABCD);
+
+        assert_eq!(*upper_reg, 0xAB);
+        assert_eq!(*lower_reg, 0xCD);
     }
 }
 
