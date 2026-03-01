@@ -67,18 +67,40 @@ impl CPU {
         }
     }
 
-    /// Takes references to the upper and lower 8 bits of a register and returns their value
-    fn get_registers(upper_reg: &u8, lower_reg: &u8) -> u16 {
-        ((*upper_reg as u16) << 8) | (*lower_reg as u16)
+    fn get_af(self) -> u16 {
+        ((self.registers.a as u16) << 8) | (self.registers.a as u16)
     }
 
-    /// Takes references to the upper and lower 8 bits of a register and assigns their value
-    fn set_registers(upper_reg: &mut u8, lower_reg: &mut u8, value: u16) {
-        let value_upper = (value >> 8) as u8;
-        let value_lower = (value & 0x0F) as u8;
+    fn get_bc(self) -> u16 {
+        ((self.registers.b as u16) << 8) | (self.registers.c as u16)
+    }
 
-        *upper_reg = value_upper;
-        *lower_reg = value_lower;
+    fn get_de(self) -> u16 {
+        ((self.registers.d as u16) << 8) | (self.registers.e as u16)
+    }
+
+    fn get_hl(self) -> u16 {
+        ((self.registers.h as u16) << 8) | (self.registers.l as u16)
+    }
+
+    fn set_af(&mut self, value: u16) {
+        self.registers.a = (value >> 8) as u8;
+        self.registers.f = (value | 0x0F) as u8;
+    }
+
+    fn set_bc(&mut self, value: u16) {
+        self.registers.b = (value >> 8) as u8;
+        self.registers.c = (value | 0x0F) as u8;
+    }
+
+    fn set_de(&mut self, value: u16) {
+        self.registers.d = (value >> 8) as u8;
+        self.registers.e = (value | 0x0F) as u8;
+    }
+
+    fn set_hl(&mut self, value: u16) {
+        self.registers.h = (value >> 8) as u8;
+        self.registers.l = (value | 0x0F) as u8;
     }
 }
 
