@@ -67,40 +67,56 @@ impl CPU {
         }
     }
 
-    fn get_af(self) -> u16 {
-        ((self.registers.a as u16) << 8) | (self.registers.a as u16)
+    fn get_af(&self) -> u16 {
+        ((self.registers.a as u16) << 8) | (self.registers.f as u16)
     }
 
-    fn get_bc(self) -> u16 {
+    fn get_bc(&self) -> u16 {
         ((self.registers.b as u16) << 8) | (self.registers.c as u16)
     }
 
-    fn get_de(self) -> u16 {
+    fn get_de(&self) -> u16 {
         ((self.registers.d as u16) << 8) | (self.registers.e as u16)
     }
 
-    fn get_hl(self) -> u16 {
+    fn get_hl(&self) -> u16 {
         ((self.registers.h as u16) << 8) | (self.registers.l as u16)
     }
 
     fn set_af(&mut self, value: u16) {
         self.registers.a = (value >> 8) as u8;
-        self.registers.f = (value | 0x0F) as u8;
+        self.registers.f = (value & 0x00FF) as u8;
     }
 
     fn set_bc(&mut self, value: u16) {
         self.registers.b = (value >> 8) as u8;
-        self.registers.c = (value | 0x0F) as u8;
+        self.registers.c = (value & 0x00FF) as u8;
     }
 
     fn set_de(&mut self, value: u16) {
         self.registers.d = (value >> 8) as u8;
-        self.registers.e = (value | 0x0F) as u8;
+        self.registers.e = (value & 0x00FF) as u8;
     }
 
     fn set_hl(&mut self, value: u16) {
         self.registers.h = (value >> 8) as u8;
-        self.registers.l = (value | 0x0F) as u8;
+        self.registers.l = (value & 0x00FF) as u8;
+    }
+
+    fn get_zero_bit(&self) -> u8 {
+        (self.registers.f & FlagBitMasks::ZERO) >> 7
+    }
+
+    fn get_subtract_bit(&self) -> u8 {
+        (self.registers.f & FlagBitMasks::SUBTRACT) >> 7
+    }
+
+    fn get_half_carry_bit(&self) -> u8 {
+        (self.registers.f & FlagBitMasks::HALF_CARRY) >> 7
+    }
+
+    fn get_carry_bit(&self) -> u8 {
+        (self.registers.f & FlagBitMasks::CARRY) >> 7
     }
 }
 
@@ -130,6 +146,33 @@ mod tests {
         };
 
         assert_eq!(cpu.registers, reg);
+    }
+
+    #[test]
+    fn registers() {
+        let mut cpu = CPU::new();
+
+        cpu.set_af(0xAAFF);
+        cpu.set_bc(0xBBCC);
+        cpu.set_de(0xDDEE);
+        cpu.set_hl(0x1122);
+
+        assert_eq!(cpu.get_af(), 0xAAFF);
+        assert_eq!(cpu.get_bc(), 0xBBCC);
+        assert_eq!(cpu.get_de(), 0xDDEE);
+        assert_eq!(cpu.get_hl(), 0x1122);
+    }
+
+    #[test]
+    fn flags() {
+        let mut cpu = CPU::new();
+
+        cpu.registers.f = 0xF0;
+
+        assert_eq!(cpu.get_zero_bit(), 1);
+        assert_eq!(cpu.get_subtract_bit(), 1);
+        assert_eq!(cpu.get_half_carry_bit(), 1);
+        assert_eq!(cpu.get_carry_bit(), 1);
     }
 }
 
