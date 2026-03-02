@@ -108,15 +108,15 @@ impl CPU {
     }
 
     fn get_subtract_bit(&self) -> u8 {
-        (self.registers.f & FlagBitMasks::SUBTRACT) >> 7
+        (self.registers.f & FlagBitMasks::SUBTRACT) >> 6
     }
 
     fn get_half_carry_bit(&self) -> u8 {
-        (self.registers.f & FlagBitMasks::HALF_CARRY) >> 7
+        (self.registers.f & FlagBitMasks::HALF_CARRY) >> 5
     }
 
     fn get_carry_bit(&self) -> u8 {
-        (self.registers.f & FlagBitMasks::CARRY) >> 7
+        (self.registers.f & FlagBitMasks::CARRY) >> 4
     }
 }
 
