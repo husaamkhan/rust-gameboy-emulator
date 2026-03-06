@@ -118,6 +118,38 @@ impl CPU {
     fn get_carry_bit(&self) -> u8 {
         (self.registers.f & FlagBitMasks::CARRY) >> 4
     }
+
+    fn set_zero_bit(&mut self, bit: u8) {
+        if bit == 1 {
+            self.registers.f |= FlagBitMasks::ZERO;
+        } else {
+            self.registers.f &= !FlagBitMasks::ZERO;
+        }
+    }
+
+    fn set_subtract_bit(&mut self, bit: u8) {
+        if bit == 1 {
+            self.registers.f |= FlagBitMasks::SUBTRACT;
+        } else {
+            self.registers.f &= !FlagBitMasks::SUBTRACT;
+        }
+    }
+
+    fn set_half_carry_bit(&mut self, bit: u8) {
+        if bit == 1 {
+            self.registers.f |= FlagBitMasks::HALF_CARRY;
+        } else {
+            self.registers.f &= !FlagBitMasks::HALF_CARRY;
+        }
+    }
+    
+    fn set_carry_bit(&mut self, bit: u8) {
+        if bit == 1 {
+            self.registers.f |= FlagBitMasks::CARRY;
+        } else {
+            self.registers.f &= !FlagBitMasks::CARRY;
+        }
+    }
 }
 
 #[cfg(test)]
@@ -149,7 +181,7 @@ mod tests {
     }
 
     #[test]
-    fn registers() {
+    fn set_get_registers() {
         let mut cpu = CPU::new();
 
         cpu.set_af(0xAAFF);
@@ -164,14 +196,39 @@ mod tests {
     }
 
     #[test]
-    fn flags() {
+    fn set_get_flags() {
         let mut cpu = CPU::new();
 
-        cpu.registers.f = 0xF0;
+        cpu.registers.f = 0;
 
+        cpu.set_zero_bit(1);
         assert_eq!(cpu.get_zero_bit(), 1);
+        assert_eq!(cpu.get_subtract_bit(), 0);
+        assert_eq!(cpu.get_half_carry_bit(), 0);
+        assert_eq!(cpu.get_carry_bit(), 0);
+
+        cpu.registers.f = 0;
+
+        cpu.set_subtract_bit(1);
+        assert_eq!(cpu.get_zero_bit(), 0);
         assert_eq!(cpu.get_subtract_bit(), 1);
+        assert_eq!(cpu.get_half_carry_bit(), 0);
+        assert_eq!(cpu.get_carry_bit(), 0);
+
+        cpu.registers.f = 0;
+
+        cpu.set_half_carry_bit(1);
+        assert_eq!(cpu.get_zero_bit(), 0);
+        assert_eq!(cpu.get_subtract_bit(), 0);
         assert_eq!(cpu.get_half_carry_bit(), 1);
+        assert_eq!(cpu.get_carry_bit(), 0);
+
+        cpu.registers.f = 0;
+
+        cpu.set_carry_bit(1);
+        assert_eq!(cpu.get_zero_bit(), 0);
+        assert_eq!(cpu.get_subtract_bit(), 0);
+        assert_eq!(cpu.get_half_carry_bit(), 0);
         assert_eq!(cpu.get_carry_bit(), 1);
     }
 }
