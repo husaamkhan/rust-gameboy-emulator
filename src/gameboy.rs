@@ -1,7 +1,6 @@
 use std::{
     fs::File,
     fmt,
-    io::Cursor,
     rc::Rc
 };
 
@@ -75,6 +74,7 @@ impl Gameboy {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::io::Cursor;
 
     #[test]
     fn read_rom_from_buffer_empty() {
