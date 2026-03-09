@@ -29,14 +29,13 @@ impl fmt::Display for GameboyError {
 }
 
 pub struct Gameboy {
-    rom: Vec<u8>,
     cpu: CPU,
     bus: Rc<DataBus>
 }
 
 impl Gameboy {
-    pub fn new() -> Gameboy {
-        Gameboy { rom: Vec::new(), cpu: CPU::new(), bus: Rc::new(DataBus::new()) }
+    pub fn new() -> Gameboy { // TODO: Modify so that components can be mocked
+        Gameboy { cpu: CPU::new(), bus: Rc::new(DataBus::new()) }
     }
 
     pub fn init(&mut self) {
@@ -65,7 +64,7 @@ impl Gameboy {
             return Err(GameboyError::RomTooLarge);
         }
 
-        self.rom = data;
+        self.bus.load_rom(data);
         
         Ok(())
     }

@@ -1,6 +1,13 @@
-pub struct Memory {}
+pub struct Memory {
+    rom: Vec<u8>
+}
+
 impl Memory {
     pub fn new() -> Memory {
-        Memory {}
+        Memory { rom: Vec::new() }
+    }
+
+    pub fn load_rom(&mut self, data: Vec<u8>) {
+        self.rom = data;
     }
 }
