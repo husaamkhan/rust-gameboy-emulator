@@ -1,3 +1,6 @@
+use crate::databus::DataBus;
+use std::rc::Rc;
+
 /**
  * Contains all CPU registers.
  *
@@ -38,13 +41,14 @@ impl FlagBitMasks {
 }
 
 pub struct CPU {
-    registers: Registers
+    registers: Registers,
+    bus: Option<Rc<DataBus>>
 }
 
 impl CPU {
     pub fn new() -> CPU { 
         let r = Registers { a: 0, f: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, sp: 0, pc: 0 };
-        CPU { registers: r }
+        CPU { registers: r, bus: None }
     }
 
     pub fn initialize_registers(&mut self, dmg_mode: bool) {
@@ -65,6 +69,10 @@ impl CPU {
             self.registers.h = 0x00;
             self.registers.l = 0x7c;
         }
+    }
+
+    pub fn connect_bus(&mut self, b: Rc<DataBus>) {
+        self.bus = Some(b);
     }
 
     fn get_af(&self) -> u16 {

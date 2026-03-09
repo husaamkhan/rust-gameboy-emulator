@@ -5,6 +5,8 @@ use std::{
 
 mod gameboy;
 mod cpu;
+mod databus;
+mod memory;
 use gameboy::Gameboy;
 
 const NUM_ARGS: usize = 2;
@@ -19,6 +21,7 @@ fn main() {
     
     let rom_path = &args[1];
     let mut gb = Gameboy::new();
+    gb.init();
 
     println!("Loading ROM: {rom_path}");
     match gb.load_rom(rom_path) {

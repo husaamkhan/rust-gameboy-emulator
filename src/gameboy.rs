@@ -1,10 +1,12 @@
 use std::{
     fs::File,
     fmt,
-    io::Cursor
+    io::Cursor,
+    rc::Rc
 };
 
 use crate::cpu::CPU;
+use crate::databus::DataBus;
 
 const MAX_ROM_SIZE: usize = 8000;
 
@@ -29,12 +31,17 @@ impl fmt::Display for GameboyError {
 
 pub struct Gameboy {
     rom: Vec<u8>,
-    cpu: CPU
+    cpu: CPU,
+    bus: Rc<DataBus>
 }
 
 impl Gameboy {
     pub fn new() -> Gameboy {
-        Gameboy { rom: Vec::new(), cpu: CPU::new() }
+        Gameboy { rom: Vec::new(), cpu: CPU::new(), bus: Rc::new(DataBus::new()) }
+    }
+
+    pub fn init(&mut self) {
+        self.cpu.connect_bus(self.bus.clone());
     }
 
     pub fn load_rom(&mut self, filepath: &str) -> Result<(), GameboyError> {
