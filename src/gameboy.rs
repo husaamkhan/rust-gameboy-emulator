@@ -34,7 +34,7 @@ pub struct Gameboy {
 }
 
 impl Gameboy {
-    pub fn new() -> Gameboy { // TODO: Modify so that components can be mocked
+    pub fn new() -> Gameboy {
         Gameboy { cpu: CPU::new(), bus: Rc::new(DataBus::new()) }
     }
 
