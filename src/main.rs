@@ -5,7 +5,6 @@ use std::{
 
 mod gameboy;
 mod cpu;
-mod databus;
 mod memory;
 use gameboy::Gameboy;
 

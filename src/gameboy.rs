@@ -5,7 +5,7 @@ use std::{
 };
 
 use crate::cpu::CPU;
-use crate::databus::DataBus;
+use crate::memory::Memory;
 
 const MAX_ROM_SIZE: usize = 8000;
 
@@ -30,16 +30,16 @@ impl fmt::Display for GameboyError {
 
 pub struct Gameboy {
     cpu: CPU,
-    bus: Rc<DataBus>
+    memory: Rc<Memory>
 }
 
 impl Gameboy {
     pub fn new() -> Gameboy {
-        Gameboy { cpu: CPU::new(), bus: Rc::new(DataBus::new()) }
+        Gameboy { cpu: CPU::new(), memory: Rc::new(Memory::new()) }
     }
 
     pub fn init(&mut self) {
-        self.cpu.connect_bus(self.bus.clone());
+        self.cpu.init(self.memory);
     }
 
     pub fn load_rom(&mut self, filepath: &str) -> Result<(), GameboyError> {
@@ -64,7 +64,7 @@ impl Gameboy {
             return Err(GameboyError::RomTooLarge);
         }
 
-        self.bus.load_rom(data);
+        self.memory.load_rom(data);
         
         Ok(())
     }

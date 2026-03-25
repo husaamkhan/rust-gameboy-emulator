@@ -1,4 +1,4 @@
-use crate::databus::DataBus;
+use crate::memory::Memory;
 use std::rc::Rc;
 
 /**
@@ -42,13 +42,14 @@ impl FlagBitMasks {
 
 pub struct CPU {
     registers: Registers,
-    bus: Option<Rc<DataBus>>
+    memory: Option<Rc<Memory>>,
+    stall_cycles: u8
 }
 
 impl CPU {
     pub fn new() -> CPU { 
         let r = Registers { a: 0, f: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, sp: 0, pc: 0 };
-        CPU { registers: r, bus: None }
+        CPU { registers: r, memory: None, stall_cycles: 0}
     }
 
     pub fn initialize_registers(&mut self, dmg_mode: bool) {
@@ -71,8 +72,9 @@ impl CPU {
         }
     }
 
-    pub fn connect_bus(&mut self, b: Rc<DataBus>) {
-        self.bus = Some(b);
+    pub fn cycle(&mut self) {
+        let byte = self.memory.unwrap().fetch_next_byte(self.pc);
+        pc++;
     }
 
     fn get_af(&self) -> u16 {
