@@ -87,7 +87,7 @@ mod tests {
             result,
             Err(GameboyError::EmptyRom)));
         
-        assert_eq!(gb.rom.len(), 0);
+        assert_eq!(gb.memory.borrow_mut().get_rom().len(), 0);
     }
 
     #[test]
@@ -102,7 +102,7 @@ mod tests {
             result,
             Err(GameboyError::RomTooLarge)));
         
-        assert_eq!(gb.rom.len(), 0);
+        assert_eq!(gb.memory.borrow_mut().get_rom().len(), 0);
 }
 
     #[test]
@@ -115,7 +115,7 @@ mod tests {
         let result = gb.read_rom_from_buffer(&mut buffer);
         
         assert!(matches!(result, Ok(())));
-        assert_eq!(gb.rom, data);
+        assert_eq!(gb.memory.borrow_mut().get_rom(), data);
     }
 
     #[test]
@@ -127,7 +127,7 @@ mod tests {
         let result = gb.read_rom_from_buffer(&mut buffer);
 
         assert!(matches!(result, Ok(())));
-        assert_eq!(gb.rom, data);
+        assert_eq!(gb.memory.borrow_mut().get_rom(), data);
     }
 }
 

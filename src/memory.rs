@@ -11,6 +11,10 @@ impl Memory {
         self.rom = data;
     }
 
+    pub fn get_rom(&mut self) -> Vec<u8> {
+        self.rom.clone()
+    }
+
     pub fn fetch_next_byte(&self, pc: u16) -> u8 {
         self.rom[pc as usize]
     }
