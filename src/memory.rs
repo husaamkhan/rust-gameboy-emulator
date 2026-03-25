@@ -11,7 +11,7 @@ impl Memory {
         self.rom = data;
     }
 
-    pub fn get_rom(&mut self) -> Vec<u8> {
+    pub fn get_rom(&self) -> Vec<u8> {
         self.rom.clone()
     }
 
