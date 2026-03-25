@@ -1,5 +1,8 @@
 use crate::memory::Memory;
-use std::rc::Rc;
+use std::{
+    rc::Rc,
+    cell::RefCell
+};
 
 /**
  * Contains all CPU registers.
@@ -42,7 +45,7 @@ impl FlagBitMasks {
 
 pub struct CPU {
     registers: Registers,
-    memory: Option<Rc<Memory>>,
+    memory: Option<Rc<RefCell<Memory>>>,
     stall_cycles: u8
 }
 
@@ -72,9 +75,14 @@ impl CPU {
         }
     }
 
+    pub fn init(&mut self, mem: Rc<RefCell<Memory>>) {
+        self.memory = Some(mem);
+    }
+
     pub fn cycle(&mut self) {
-        let byte = self.memory.unwrap().fetch_next_byte(self.pc);
-        pc++;
+        let byte = self.memory.as_ref().unwrap().borrow_mut().fetch_next_byte(self.registers.pc);
+        // TODO: Add decode and execute logic
+        self.registers.pc += 1;
     }
 
     fn get_af(&self) -> u16 {

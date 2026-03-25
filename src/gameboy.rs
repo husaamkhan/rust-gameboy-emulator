@@ -1,7 +1,8 @@
 use std::{
     fs::File,
     fmt,
-    rc::Rc
+    rc::Rc,
+    cell::RefCell
 };
 
 use crate::cpu::CPU;
@@ -30,16 +31,16 @@ impl fmt::Display for GameboyError {
 
 pub struct Gameboy {
     cpu: CPU,
-    memory: Rc<Memory>
+    memory: Rc<RefCell<Memory>>
 }
 
 impl Gameboy {
     pub fn new() -> Gameboy {
-        Gameboy { cpu: CPU::new(), memory: Rc::new(Memory::new()) }
+        Gameboy { cpu: CPU::new(), memory: Rc::new(RefCell::new(Memory::new())) }
     }
 
     pub fn init(&mut self) {
-        self.cpu.init(self.memory);
+        self.cpu.init(Rc::clone(&self.memory));
     }
 
     pub fn load_rom(&mut self, filepath: &str) -> Result<(), GameboyError> {
@@ -64,7 +65,7 @@ impl Gameboy {
             return Err(GameboyError::RomTooLarge);
         }
 
-        self.memory.load_rom(data);
+        self.memory.borrow_mut().load_rom(data);
         
         Ok(())
     }
