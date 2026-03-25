@@ -10,4 +10,8 @@ impl Memory {
     pub fn load_rom(&mut self, data: Vec<u8>) {
         self.rom = data;
     }
+
+    pub fn fetch_next_byte(&self, pc: u16) -> u8 {
+        self.rom[pc as usize]
+    }
 }
