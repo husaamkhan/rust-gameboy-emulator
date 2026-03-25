@@ -16,6 +16,6 @@ impl Memory {
     }
 
     pub fn fetch_next_byte(&self, pc: u16) -> u8 {
-        self.rom[pc as usize]
+        *self.rom.get(pc as usize).expect("Invalid memory access! PC is out of bounds.")
     }
 }
