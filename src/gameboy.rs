@@ -74,19 +74,14 @@ impl Gameboy {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::io::Cursor;
 
     #[test]
     fn read_rom_from_buffer_empty() {
         let mut gb = Gameboy::new();
-        let mut buffer = Cursor::new(Vec::new());
         
-        let result = gb.read_rom_from_buffer(&mut buffer);
+        let result = gb.read_rom_from_buffer(&mut [].as_ref());
 
-        assert!(matches!(
-            result,
-            Err(GameboyError::EmptyRom)));
-        
+        assert!(matches!(result, Err(GameboyError::EmptyRom)));
         assert_eq!(gb.memory.borrow_mut().get_rom().len(), 0);
     }
 
@@ -94,25 +89,19 @@ mod tests {
     fn read_rom_from_buffer_rom_too_large() {
         let mut gb = Gameboy::new();
         let data: Vec<u8> = vec![0; MAX_ROM_SIZE+1];
-        let mut buffer = Cursor::new(data);
         
-        let result = gb.read_rom_from_buffer(&mut buffer);
+        let result = gb.read_rom_from_buffer(&mut data.as_slice());
 
-        assert!(matches!(
-            result,
-            Err(GameboyError::RomTooLarge)));
-        
+        assert!(matches!(result, Err(GameboyError::RomTooLarge)));
         assert_eq!(gb.memory.borrow_mut().get_rom().len(), 0);
-}
+    }
 
     #[test]
     fn read_rom_from_buffer_valid() {
         let mut gb = Gameboy::new();
-
         let data = vec![1, 2, 3, 4, 5];
-        let mut buffer = Cursor::new(&data);
 
-        let result = gb.read_rom_from_buffer(&mut buffer);
+        let result = gb.read_rom_from_buffer(&mut data.as_slice());
         
         assert!(matches!(result, Ok(())));
         assert_eq!(gb.memory.borrow_mut().get_rom(), data);
@@ -122,9 +111,8 @@ mod tests {
     fn read_rom_from_buffer_large_rom() {
         let mut gb = Gameboy::new();
         let data: Vec<u8> = vec![1; MAX_ROM_SIZE];
-        let mut buffer = Cursor::new(data.clone());
         
-        let result = gb.read_rom_from_buffer(&mut buffer);
+        let result = gb.read_rom_from_buffer(&mut data.as_slice());
 
         assert!(matches!(result, Ok(())));
         assert_eq!(gb.memory.borrow_mut().get_rom(), data);
