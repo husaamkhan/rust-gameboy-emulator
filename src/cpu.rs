@@ -80,9 +80,13 @@ impl CPU {
     }
 
     pub fn cycle(&mut self) {
-        let byte = self.memory.as_ref().unwrap().borrow_mut().fetch_next_byte(self.registers.pc);
+        let byte = self.memory.as_ref().unwrap().borrow_mut().fetch_byte(self.registers.pc);
         // TODO: Add decode and execute logic
         self.registers.pc += 1;
+    }
+
+    fn copy_register(&mut self, reg1: &u8, reg2: &u8) {
+
     }
 
     fn get_af(&self) -> u16 {
