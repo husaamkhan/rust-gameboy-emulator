@@ -37,6 +37,20 @@ impl Memory {
             get(index as usize).
             expect("Invalid memory access! PC is out of bounds.")
     }
+
+    pub fn write(&mut self, addr: u16, value: u8) {
+        // TODO: add writes to remaining writeable memory regions
+        // Writes value to the correct ram vector, based on the memory map
+        if addr >= HRAM_START || addr < HRAM_END {
+            self.hram[(addr - HRAM_START) as usize] = value;
+        } else if addr >= EXTERN_RAM_START || addr < EXTERN_RAM_END {
+            self.external_ram[(addr - EXTERN_RAM_START) as usize] = value;
+        } else if addr >= WRAM_START || addr < WRAM_END {
+            self.ram[(addr - WRAM_START) as usize] = value;
+        } else {
+            panic!("Error: Attempted write to invalid memory region!");
+        }
+    }
 }
 
 #[cfg(test)]
