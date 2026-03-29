@@ -80,6 +80,11 @@ impl CPU {
     }
 
     pub fn cycle(&mut self) {
+        if self.stall_cycles > 0 {
+            self.stall_cycles -= 1;
+            return;
+        }
+
         let byte = self.memory.as_ref().unwrap().borrow_mut().fetch_byte(self.registers.pc);
         // TODO: Add decode and execute logic
         self.registers.pc += 1;
