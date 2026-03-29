@@ -80,13 +80,19 @@ impl CPU {
     }
 
     pub fn cycle(&mut self) {
-        let byte = self.memory.as_ref().unwrap().borrow_mut().fetch_byte(self.registers.pc);
+        let byte = self.memory.
+            as_ref().
+            unwrap().
+            borrow_mut().
+            fetch_byte(self.registers.pc);
+
         // TODO: Add decode and execute logic
         self.registers.pc += 1;
     }
 
-    fn copy_register(&mut self, reg1: &u8, reg2: &u8) {
-
+    /** LD r8,r8 */
+    fn copy_register(dest_reg: &mut u8, src_reg: &u8) {
+        *dest_reg = *src_reg;
     }
 
     fn get_af(&self) -> u16 {
@@ -252,6 +258,17 @@ mod tests {
         assert_eq!(cpu.get_subtract_bit(), 0);
         assert_eq!(cpu.get_half_carry_bit(), 0);
         assert_eq!(cpu.get_carry_bit(), 1);
+    }
+
+    #[test]
+    fn copy_register() {
+        let mut cpu = CPU::new();
+        cpu.registers.a = 1;
+        cpu.registers.b = 2;
+
+        CPU::copy_register(&mut cpu.registers.a, &cpu.registers.b);
+
+        assert_eq!(cpu.registers.a, cpu.registers.b);
     }
 }
 
