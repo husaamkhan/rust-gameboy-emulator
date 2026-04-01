@@ -121,7 +121,6 @@ impl CPU {
                 let upper_byte = fetch_next_byte();
                 let lower_byte = fetch_next_byte();
                 
-                let value = ((upper_byte << 8) | lower_byte) as u16;
                 let value = ((upper_byte as u16) << 8) | lower_byte as u16;
                 self.set_bc(value);
             }
