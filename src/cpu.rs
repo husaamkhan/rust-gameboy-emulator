@@ -136,7 +136,6 @@ impl CPU {
             }
 
         }
-
     }
 
     fn get_af(&self) -> u16 {
