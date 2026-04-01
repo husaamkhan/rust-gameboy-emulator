@@ -45,8 +45,8 @@ impl FlagBitMasks {
 
 pub struct CPU {
     registers: Registers,
-    memory: Rc<RefCell<Memory>>,
-    stall_cycles: u8
+    memory: Option<Rc<RefCell<Memory>>>,
+    stall_cycles: u8 // Used to skip T-states to replicate instructions taking multiple cpu cycles to complete
 }
 
 impl CPU {
@@ -98,11 +98,44 @@ impl CPU {
         }
 
         let byte = self.memory.as_ref().borrow_mut().fetch_byte(self.registers.pc);
-        // TODO: Add decode and execute logic
-        self.registers.pc += 1;
-    }
+        let mut fetch_next_byte = || -> u8 {
+            let byte = self.memory.
+                as_ref().
+                borrow_mut().
+                fetch_byte(self.registers.pc);
 
-    fn copy_register(&mut self, reg1: &u8, reg2: &u8) {
+            self.registers.pc += 1;
+            byte
+        };
+
+        let opcode = fetch_next_byte();
+
+        match opcode {
+            0x0 => { // NO-OP, just stalls the cpu for 4 T states
+                self.stall_cycles = 4;
+            }
+
+            0x1 => { // LD BC,n16
+                self.stall_cycles = 12;
+
+                let upper_byte = fetch_next_byte();
+                let lower_byte = fetch_next_byte();
+                
+                let value = ((upper_byte << 8) | lower_byte) as u16;
+                let value = ((upper_byte as u16) << 8) | lower_byte as u16;
+                self.set_bc(value);
+            }
+
+            0x2 => {
+                self.stall_cycles = 8;
+
+            }
+
+            _ => { // Handles unknown opcodes
+                panic!("Error: couldn't decode instruction: {opcode}");
+            }
+
+        }
 
     }
 
