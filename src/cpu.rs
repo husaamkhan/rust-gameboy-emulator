@@ -45,14 +45,30 @@ impl FlagBitMasks {
 
 pub struct CPU {
     registers: Registers,
-    memory: Option<Rc<RefCell<Memory>>>,
+    memory: Rc<RefCell<Memory>>,
     stall_cycles: u8
 }
 
 impl CPU {
-    pub fn new() -> CPU { 
-        let r = Registers { a: 0, f: 0, b: 0, c: 0, d: 0, e: 0, h: 0, l: 0, sp: 0, pc: 0 };
-        CPU { registers: r, memory: None, stall_cycles: 0}
+    pub fn new(mem: Rc<RefCell<Memory>>) -> CPU { 
+        let r = Registers {
+            a: 0,
+            f: 0,
+            b: 0,
+            c: 0,
+            d: 0,
+            e: 0,
+            h: 0,
+            l: 0,
+            sp: 0,
+            pc: 0
+        };
+
+        CPU {
+            registers: r,
+            memory: mem,
+            stall_cycles: 0
+        }
     }
 
     pub fn initialize_registers(&mut self, dmg_mode: bool) {
@@ -75,17 +91,13 @@ impl CPU {
         }
     }
 
-    pub fn init(&mut self, mem: Rc<RefCell<Memory>>) {
-        self.memory = Some(mem);
-    }
-
     pub fn cycle(&mut self) {
         if self.stall_cycles > 0 {
             self.stall_cycles -= 1;
             return;
         }
 
-        let byte = self.memory.as_ref().unwrap().borrow_mut().fetch_byte(self.registers.pc);
+        let byte = self.memory.as_ref().borrow_mut().fetch_byte(self.registers.pc);
         // TODO: Add decode and execute logic
         self.registers.pc += 1;
     }

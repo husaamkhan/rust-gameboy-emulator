@@ -36,11 +36,11 @@ pub struct Gameboy {
 
 impl Gameboy {
     pub fn new() -> Gameboy {
-        Gameboy { cpu: CPU::new(), memory: Rc::new(RefCell::new(Memory::new())) }
-    }
-
-    pub fn init(&mut self) {
-        self.cpu.init(Rc::clone(&self.memory));
+        let memory = Rc::new(RefCell::new(Memory::new()));
+        Gameboy {
+            cpu: CPU::new(Rc::clone(&memory)),
+            memory
+        }
     }
 
     pub fn load_rom(&mut self, filepath: &str) -> Result<(), GameboyError> {
