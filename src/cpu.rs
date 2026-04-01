@@ -45,7 +45,7 @@ impl FlagBitMasks {
 
 pub struct CPU {
     registers: Registers,
-    memory: Option<Rc<RefCell<Memory>>>,
+    memory: Rc<RefCell<Memory>>,
     stall_cycles: u8 // Used to skip T-states to replicate instructions taking multiple cpu cycles to complete
 }
 
