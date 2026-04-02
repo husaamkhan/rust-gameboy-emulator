@@ -129,6 +129,11 @@ impl CPU {
                 self.memory.borrow_mut().write(self.get_bc(), self.registers.a);
             }
 
+            0x3 => { // INC BC
+                self.stall_cycles = 1;
+                self.set_bc(self.get_bc()+1);
+            }
+
             _ => { // Handles unknown opcodes
                 panic!("Error: couldn't decode instruction: {opcode}");
             }
