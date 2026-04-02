@@ -97,7 +97,6 @@ impl CPU {
             return;
         }
 
-        let byte = self.memory.as_ref().borrow_mut().fetch_byte(self.registers.pc);
         let mut fetch_next_byte = || -> u8 {
             let byte = self.memory.
                 as_ref().
@@ -118,10 +117,11 @@ impl CPU {
             0x1 => { // LD BC,n16
                 self.stall_cycles = 12;
 
-                let upper_byte = fetch_next_byte();
-                let lower_byte = fetch_next_byte();
+                // Gameboy colour is little-endian, lower byte comes first
+                let low_byte = fetch_next_byte();
+                let high_byte = fetch_next_byte();
                 
-                let value = ((upper_byte as u16) << 8) | lower_byte as u16;
+                let value = ((high_byte as u16) << 8) | low_byte as u16;
                 self.set_bc(value);
             }
 
