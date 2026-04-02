@@ -32,7 +32,7 @@ impl Memory {
         self.rom.clone()
     }
 
-    pub fn fetch_byte(&self, index: u16) -> u8 {
+    pub fn fetch_byte_from_rom(&self, index: u16) -> u8 {
         *self.rom.
             get(index as usize).
             expect("Invalid memory access! PC is out of bounds.")

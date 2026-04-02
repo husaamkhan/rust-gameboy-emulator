@@ -100,7 +100,7 @@ impl CPU {
             let byte = self.memory.
                 as_ref().
                 borrow_mut().
-                fetch_byte(self.registers.pc);
+                fetch_byte_from_rom(self.registers.pc);
 
             self.registers.pc += 1;
             byte
