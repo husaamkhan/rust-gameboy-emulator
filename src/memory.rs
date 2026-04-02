@@ -52,6 +52,12 @@ impl Memory {
 mod tests {
     use super::*;
 
+    impl Memory {
+        pub fn get_rom(&self) -> Vec<u8> {
+            self.rom.clone()
+        }
+    }
+
     #[test]
     fn fetch_byte_from_rom() {
         let mut memory = Memory::new();
