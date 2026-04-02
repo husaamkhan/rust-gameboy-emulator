@@ -44,7 +44,7 @@ impl Gameboy {
     }
 
     pub fn load_rom(&mut self, filepath: &str) -> Result<(), GameboyError> {
-        let mut file = File::open(filepath).map_err(|err| GameboyError::IOError(err))?;
+        let mut file = File::open(filepath).map_err(GameboyError::IOError)?;
         self.read_rom_from_buffer(&mut file)
     }
 
@@ -57,7 +57,7 @@ impl Gameboy {
      */
     fn read_rom_from_buffer<Buffer: std::io::Read>(&mut self, buffer: &mut Buffer) -> Result<(), GameboyError> {
         let mut data: Vec<u8> = Vec::new();
-        buffer.read_to_end(&mut data).map_err(|err| GameboyError::IOError(err))?;
+        buffer.read_to_end(&mut data).map_err(GameboyError::IOError)?;
 
         if data.is_empty() {
             return Err(GameboyError::EmptyRom);
