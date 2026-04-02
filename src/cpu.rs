@@ -111,11 +111,11 @@ impl CPU {
 
         match opcode {
             0x0 => { // NO-OP, just stalls the cpu for 4 T states
-                self.stall_cycles = 4;
+                self.stall_cycles = 3;
             }
 
             0x1 => { // LD BC,n16
-                self.stall_cycles = 12;
+                self.stall_cycles = 11;
 
                 // Gameboy colour is little-endian, lower byte comes first
                 let low_byte = fetch_next_byte();
@@ -126,8 +126,8 @@ impl CPU {
             }
 
             0x2 => {
-                self.stall_cycles = 8;
-
+                self.stall_cycles = 7;
+                
             }
 
             _ => { // Handles unknown opcodes
