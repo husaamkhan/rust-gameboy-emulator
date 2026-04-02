@@ -17,9 +17,9 @@ impl Memory {
     pub fn new() -> Memory {
         Memory {
             rom: Vec::new(),
-            hram: Vec::new(),
-            external_ram: Vec::new(),
-            ram: Vec::new()
+            hram: vec![0u8; (HRAM_END - HRAM_START+1) as usize],
+            external_ram: vec![0u8; (EXTERN_RAM_END - EXTERN_RAM_START-1) as usize],
+            ram: vec![0u8; (WRAM_END - WRAM_START-1) as usize]
         }
     }
 
