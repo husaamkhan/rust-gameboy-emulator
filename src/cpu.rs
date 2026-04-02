@@ -124,9 +124,9 @@ impl CPU {
                 self.set_bc(value);
             }
 
-            0x2 => {
+            0x2 => { // LD [BC], A
                 self.stall_cycles = 7;
-                
+                self.memory.borrow_mut().write(self.get_bc(), self.registers.a);
             }
 
             _ => { // Handles unknown opcodes
