@@ -227,7 +227,7 @@ mod tests {
 
     #[test]
     fn initialize_registers_cgb() {
-        let mut cpu = CPU::new();
+        let mut cpu = CPU::new(Rc::new(RefCell::new(Memory::new())));
         cpu.initialize_registers(false);
 
         let reg = Registers {
@@ -239,7 +239,7 @@ mod tests {
 
     #[test]
     fn initialize_registers_dmg() {
-        let mut cpu = CPU::new();
+        let mut cpu = CPU::new(Rc::new(RefCell::new(Memory::new())));
         cpu.initialize_registers(true);
 
         let reg = Registers {
@@ -251,7 +251,7 @@ mod tests {
 
     #[test]
     fn set_get_registers() {
-        let mut cpu = CPU::new();
+        let mut cpu = CPU::new(Rc::new(RefCell::new(Memory::new())));
 
         cpu.set_af(0xAAFF);
         cpu.set_bc(0xBBCC);
@@ -266,7 +266,7 @@ mod tests {
 
     #[test]
     fn set_get_flags() {
-        let mut cpu = CPU::new();
+        let mut cpu = CPU::new(Rc::new(RefCell::new(Memory::new())));
 
         cpu.registers.f = 0;
 
