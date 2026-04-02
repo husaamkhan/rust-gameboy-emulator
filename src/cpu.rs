@@ -4,6 +4,8 @@ use std::{
     cell::RefCell
 };
 
+const HALF_CARRY_THRESHOLD: u8 = 0xF;
+
 /**
  * Contains all CPU registers.
  *
@@ -108,6 +110,8 @@ impl CPU {
 
         let opcode = fetch_next_byte();
 
+        // TODO: shouldn't all of these implementations be moved to their own individual functions
+        // for better test coverage?
         match opcode {
             0x0 => { // NO-OP, just stalls the cpu for 4 T states
                 self.stall_cycles = 3;
@@ -132,6 +136,20 @@ impl CPU {
             0x3 => { // INC BC
                 self.stall_cycles = 1;
                 self.set_bc(self.get_bc()+1);
+            }
+
+            0x4 => { // INC B
+                self.registers.b += 1;
+
+                if self.registers.b == 0 {
+                    self.set_zero_bit(1);
+                }
+
+                self.set_subtract_bit(0);
+
+                if self.registers.b > HALF_CARRY_THRESHOLD {
+                    self.set_half_carry_bit(1);
+                }
             }
 
             _ => { // Handles unknown opcodes
