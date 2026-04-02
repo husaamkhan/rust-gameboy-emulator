@@ -27,11 +27,6 @@ impl Memory {
         self.rom = data;
     }
 
-    // TODO: Is this function really needed?
-    pub fn get_rom(&self) -> Vec<u8> {
-        self.rom.clone()
-    }
-
     pub fn fetch_byte_from_rom(&self, index: u16) -> u8 {
         *self.rom.
             get(index as usize).
@@ -58,21 +53,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn fetch_byte() {
+    fn fetch_byte_from_rom() {
         let mut memory = Memory::new();
         memory.rom = vec![1, 2, 3];
 
-        assert_eq!(memory.fetch_byte(0), 1);
-        assert_eq!(memory.fetch_byte(1), 2);
-        assert_eq!(memory.fetch_byte(2), 3);
+        assert_eq!(memory.fetch_byte_from_rom(0), 1);
+        assert_eq!(memory.fetch_byte_from_rom(1), 2);
+        assert_eq!(memory.fetch_byte_from_rom(2), 3);
     }
 
     #[test]
-    fn fetch_byte_out_of_bounds() {
+    fn fetch_byte_from_rom_out_of_bounds() {
         let mut memory = Memory::new();
         memory.rom = vec![];
 
-        let result = std::panic::catch_unwind(|| memory.fetch_byte(0));
+        let result = std::panic::catch_unwind(|| memory.fetch_byte_from_rom(0));
         assert!(result.is_err());
     }
 
