@@ -35,12 +35,11 @@ struct Registers {
  * Contains bit masks that will be applied to CPU register f (flag register) to get the values of
  * various flag bits.
  */
-struct FlagBitMasks;
-impl FlagBitMasks {
-    const ZERO: u8 = 0x80;
-    const SUBTRACT: u8 = 0x40;
-    const HALF_CARRY: u8 = 0x20;
-    const CARRY: u8 = 0x10;
+mod FlagBitMasks {
+    pub const ZERO: u8 = 0x80;
+    pub const SUBTRACT: u8 = 0x40;
+    pub const HALF_CARRY: u8 = 0x20;
+    pub const CARRY: u8 = 0x10;
 }
 
 pub struct CPU {
