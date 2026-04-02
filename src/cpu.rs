@@ -35,7 +35,7 @@ struct Registers {
  * Contains bit masks that will be applied to CPU register f (flag register) to get the values of
  * various flag bits.
  */
-mod FlagBitMasks {
+mod flag_bit_masks {
     pub const ZERO: u8 = 0x80;
     pub const SUBTRACT: u8 = 0x40;
     pub const HALF_CARRY: u8 = 0x20;
@@ -173,50 +173,50 @@ impl CPU {
     }
 
     fn get_zero_bit(&self) -> u8 {
-        (self.registers.f & FlagBitMasks::ZERO) >> 7
+        (self.registers.f & flag_bit_masks::ZERO) >> 7
     }
 
     fn get_subtract_bit(&self) -> u8 {
-        (self.registers.f & FlagBitMasks::SUBTRACT) >> 6
+        (self.registers.f & flag_bit_masks::SUBTRACT) >> 6
     }
 
     fn get_half_carry_bit(&self) -> u8 {
-        (self.registers.f & FlagBitMasks::HALF_CARRY) >> 5
+        (self.registers.f & flag_bit_masks::HALF_CARRY) >> 5
     }
 
     fn get_carry_bit(&self) -> u8 {
-        (self.registers.f & FlagBitMasks::CARRY) >> 4
+        (self.registers.f & flag_bit_masks::CARRY) >> 4
     }
 
     fn set_zero_bit(&mut self, bit: u8) {
         if bit == 1 {
-            self.registers.f |= FlagBitMasks::ZERO;
+            self.registers.f |= flag_bit_masks::ZERO;
         } else {
-            self.registers.f &= !FlagBitMasks::ZERO;
+            self.registers.f &= !flag_bit_masks::ZERO;
         }
     }
 
     fn set_subtract_bit(&mut self, bit: u8) {
         if bit == 1 {
-            self.registers.f |= FlagBitMasks::SUBTRACT;
+            self.registers.f |= flag_bit_masks::SUBTRACT;
         } else {
-            self.registers.f &= !FlagBitMasks::SUBTRACT;
+            self.registers.f &= !flag_bit_masks::SUBTRACT;
         }
     }
 
     fn set_half_carry_bit(&mut self, bit: u8) {
         if bit == 1 {
-            self.registers.f |= FlagBitMasks::HALF_CARRY;
+            self.registers.f |= flag_bit_masks::HALF_CARRY;
         } else {
-            self.registers.f &= !FlagBitMasks::HALF_CARRY;
+            self.registers.f &= !flag_bit_masks::HALF_CARRY;
         }
     }
     
     fn set_carry_bit(&mut self, bit: u8) {
         if bit == 1 {
-            self.registers.f |= FlagBitMasks::CARRY;
+            self.registers.f |= flag_bit_masks::CARRY;
         } else {
-            self.registers.f &= !FlagBitMasks::CARRY;
+            self.registers.f &= !flag_bit_masks::CARRY;
         }
     }
 }
