@@ -4,8 +4,6 @@ use std::{
     cell::RefCell
 };
 
-const HALF_CARRY_THRESHOLD: u8 = 0xF;
-
 /**
  * Contains all CPU registers.
  *
@@ -144,8 +142,7 @@ impl CPU {
                 }
 
                 self.set_subtract_bit(0);
-
-                if self.registers.b > HALF_CARRY_THRESHOLD {
+                if CPU::check_half_carry_u8(self.registers.b-1, self.registers.b) {
                     self.set_half_carry_bit(1);
                 }
             }
@@ -158,8 +155,7 @@ impl CPU {
                 }
 
                 self.set_subtract_bit(1);
-
-                if self.registers.b > HALF_CARRY_THRESHOLD {
+                if CPU::check_half_carry_u8(self.registers.b+1, self.registers.b) {
                     self.set_half_carry_bit(1);
                 }
             }
@@ -198,7 +194,17 @@ impl CPU {
         }
     }
 
-    fn ld_r16_n16() {}
+    fn check_half_carry_u8(old_value: u8, new_value: u8) -> bool {
+        let old_bit3 = old_value >> 3;
+        let new_bit3 = new_value >> 3;
+
+        // if 1 was carried out of, or borrowed from bit 3, set the half carry flag bit to 1
+        if old_bit3 == 1 && new_bit3 == 0 {
+            return true;
+        }
+
+        false
+    }
 
     fn get_af(&self) -> u16 {
         ((self.registers.a as u16) << 8) | (self.registers.f as u16)
