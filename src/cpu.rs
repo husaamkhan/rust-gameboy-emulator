@@ -110,8 +110,6 @@ impl CPU {
 
         let opcode = fetch_next_byte();
 
-        // TODO: shouldn't all of these implementations be moved to their own individual functions
-        // for better test coverage?
         match opcode {
             0x0 => { // NO-OP, just stalls the cpu for 4 T states
                 self.stall_cycles = 3;
@@ -152,12 +150,33 @@ impl CPU {
                 }
             }
 
+            0x5 => { // DEC B
+                self.registers.b -= 1;
+
+                if self.registers.b == 0 {
+                    self.set_zero_bit(1);
+                }
+
+                self.set_subtract_bit(1);
+
+                if self.registers.b > HALF_CARRY_THRESHOLD {
+                    self.set_half_carry_bit(1);
+                }
+            }
+
+            0x6 => { // LD B,n8
+                self.stall_cycles = 1;
+                self.registers.b = fetch_next_byte();
+            }
+
             _ => { // Handles unknown opcodes
                 panic!("Error: couldn't decode instruction: {opcode}");
             }
 
         }
     }
+
+    fn ld_r16_n16() {}
 
     fn get_af(&self) -> u16 {
         ((self.registers.a as u16) << 8) | (self.registers.f as u16)
