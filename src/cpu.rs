@@ -35,6 +35,7 @@ struct Registers {
  * Contains bit masks that will be applied to CPU register f (flag register) to get the values of
  * various flag bits.
  */
+#[allow(dead_code)] // TODO: remove this later
 mod flag_bit_masks {
     pub const ZERO: u8 = 0x80;
     pub const SUBTRACT: u8 = 0x40;
