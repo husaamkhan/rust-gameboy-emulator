@@ -169,6 +169,13 @@ impl CPU {
                 self.registers.b = fetch_next_byte();
             }
 
+            0x7 => { // RLCA                
+                // Carry flag is set if the 7th bit is 1, as rotating A in that case would cause a
+                // carry
+                self.set_carry_bit(self.registers.a >> 7);
+                self.registers.a = self.registers.a << 1;
+            }
+
             _ => { // Handles unknown opcodes
                 panic!("Error: couldn't decode instruction: {opcode}");
             }
