@@ -176,6 +176,21 @@ impl CPU {
                 self.registers.a = self.registers.a << 1;
             }
 
+            0x8 => { // LD [a16],SP
+                self.stall_cycles = 19;
+
+                let low_byte = fetch_next_byte();
+                let high_byte = fetch_next_byte();
+                let addr = ((high_byte as u16) << 8) | low_byte as u16;
+
+                // truncate u16 value to u8 to get low_byte
+                let sp_low_byte = self.registers.sp as u8; 
+                let sp_high_byte = (self.registers.sp >> 8) as u8;
+
+                self.memory.borrow_mut().write(addr, sp_low_byte);
+                self.memory.borrow_mut().write(addr+1, sp_high_byte);
+            }
+
             _ => { // Handles unknown opcodes
                 panic!("Error: couldn't decode instruction: {opcode}");
             }
