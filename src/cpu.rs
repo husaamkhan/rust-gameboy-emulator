@@ -139,29 +139,11 @@ impl CPU {
             }
 
             0x4 => { // INC B
-                self.registers.b += 1;
-
-                if self.registers.b == 0 {
-                    self.set_zero_bit(1);
-                }
-
-                self.set_subtract_bit(0);
-                if CPU::check_for_half_carry_u8(self.registers.b-1, self.registers.b) {
-                    self.set_half_carry_bit(1);
-                }
+                self.registers.b = self.add_u8(self.registers.b, 1);
             }
 
             0x5 => { // DEC B
-                self.registers.b -= 1;
-
-                if self.registers.b == 0 {
-                    self.set_zero_bit(1);
-                }
-
-                self.set_subtract_bit(1);
-                if CPU::check_for_half_carry_u8(self.registers.b+1, self.registers.b) {
-                    self.set_half_carry_bit(1);
-                }
+                self.registers.b = self.sub_u8(self.registers.b, 1);
             }
 
             0x6 => { // LD B,n8
@@ -202,8 +184,31 @@ impl CPU {
         }
     }
 
+    /**
+     * Following add_u8 and sub_u8 functions are helpers for 8-bit arithmetic
+     * Set the necessary flags, and return the result
+     * NOTE: Do NOT set the carry flag
+     *
+     * To be used for various CPU instructions.
+     */
+    fn add_u8(&mut self, a: u8, b: u8) -> u8 {
+        let result = a.wrapping_add(b);
+        self.set_zero_bit(if result == 0 { 1 } else { 0 });
+        self.set_subtract_bit(0);
+        self.set_half_carry_bit(if CPU::check_for_half_carry_u8(a, b) { 1 } else { 0 });
+        result
+    }
+
+    fn sub_u8(&mut self, a: u8, b: u8) -> u8 {
+        let result = a.wrapping_sub(b);
+        self.set_zero_bit(if result == 0 { 1 } else { 0 });
+        self.set_subtract_bit(1);
+        self.set_half_carry_bit(if CPU::check_for_borrow_u8(a, b) { 1 } else { 0 });
+        result
+    }
+
     /** 
-     * Used for 8-bit addition.
+     * Used to check if a half carry occured during 8-bit addition.
      * Checks if a 1 is carried from bit 3 to bit 4.
      */
     fn check_for_half_carry_u8(operand1: u8, operand2: u8) -> bool {
@@ -215,7 +220,7 @@ impl CPU {
     }
 
     /**
-     * Used for 8-bit subtraction.
+     * Used to check if a borrow occured during 8-bit subtraction.
      * Checks if the lower nibble of the calculated difference will be less than zero.
      */
     fn check_for_borrow_u8(operand1: u8, operand2: u8) -> bool {
@@ -227,7 +232,7 @@ impl CPU {
     }
 
     /** 
-     * Used for 16-bit addition.
+     * Used to check if a half carry occured during 16-bit addition.
      * Checks if a 1 is carried from bit 11 to 12
      */
     fn check_for_half_carry_u16(operand1: u16, operand2: u16) -> bool {
