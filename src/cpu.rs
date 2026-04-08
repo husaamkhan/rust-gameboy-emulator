@@ -4,6 +4,9 @@ use std::{
     cell::RefCell
 };
 
+const HALF_CARRY_THRESHOLD_U8: u8 =     16;
+const HALF_CARRY_THRESHOLD_U16: u16 =   256;
+
 /**
  * Contains all CPU registers.
  *
@@ -143,7 +146,7 @@ impl CPU {
                 }
 
                 self.set_subtract_bit(0);
-                if CPU::check_half_carry_u8(self.registers.b-1, self.registers.b) {
+                if CPU::check_for_half_carry_u8(self.registers.b-1, self.registers.b) {
                     self.set_half_carry_bit(1);
                 }
             }
@@ -156,7 +159,7 @@ impl CPU {
                 }
 
                 self.set_subtract_bit(1);
-                if CPU::check_half_carry_u8(self.registers.b+1, self.registers.b) {
+                if CPU::check_for_half_carry_u8(self.registers.b+1, self.registers.b) {
                     self.set_half_carry_bit(1);
                 }
             }
@@ -174,7 +177,7 @@ impl CPU {
             }
 
             0x8 => { // LD [a16],SP
-                self.stall_cycles = 19;
+                self.stall_cycles = 4;
 
                 let low_byte = fetch_next_byte();
                 let high_byte = fetch_next_byte();
@@ -188,6 +191,10 @@ impl CPU {
                 self.memory.borrow_mut().write(addr+1, sp_high_byte);
             }
 
+            0x9 => { // ADD HL,BC
+                
+            }
+
             _ => { // Handles unknown opcodes
                 panic!("Error: couldn't decode instruction: {opcode}");
             }
@@ -195,12 +202,36 @@ impl CPU {
         }
     }
 
-    fn check_half_carry_u8(old_value: u8, new_value: u8) -> bool {
-        let old_bit3 = old_value >> 3;
-        let new_bit3 = new_value >> 3;
+    /** 
+     * Used for 8-bit arithmetic instructions.
+     * In addition, checks if an overflow occured from bit 3 to bit 4.
+     * In subtracction, checks if a borrow occured from bit 4 into bit 3.
+     */
+    fn check_for_half_carry_u8(old_value: u8, new_value: u8) -> bool {
+        // Gets the value stored in the lower nibble and checks if it crossed 16
+        let old_value_nibble = old_value & 0x0F;
+        let new_value_nibble = new_value & 0x0F;
 
-        // if 1 was carried out of, or borrowed from bit 3, set the half carry flag bit to 1
-        if old_bit3 == 1 && new_bit3 == 0 {
+        if old_value_nibble < HALF_CARRY_THRESHOLD_U8
+            && new_value_nibble == HALF_CARRY_THRESHOLD_U8 {
+            return true;
+        }
+
+        false
+    }
+
+    /** 
+     * Used for 16-bit arithmetic instructions.
+     * In addition, checks if an overflow occured from bit 11 to bit 12.
+     * In subtracction, checks if a borrow occured from bit 12 into bit 11.
+     */
+    fn check_for_half_carry_u16(old_value: u16, new_value: u16) -> bool {
+        // Gets the value stored in the lower nibble and checks if it crossed 16
+        let old_value_nibble = old_value & 0xFF;
+        let new_value_nibble = new_value & 0xFF;
+
+        if old_value_nibble < HALF_CARRY_THRESHOLD_U16
+            && new_value_nibble == HALF_CARRY_THRESHOLD_U16 {
             return true;
         }
 
@@ -370,6 +401,38 @@ mod tests {
         assert_eq!(cpu.get_subtract_bit(), 0);
         assert_eq!(cpu.get_half_carry_bit(), 0);
         assert_eq!(cpu.get_carry_bit(), 1);
+    }
+
+    #[test]
+    fn check_for_half_carry_u8_carry() {
+        let old_value = 15; // 0b00001111
+        let new_value = 16; // 0b00010000
+        
+        assert!(CPU::check_for_half_carry_u8(old_value, new_value));
+    }
+
+    #[test]
+    fn check_for_half_carry_u8_borrow() {
+        let old_value = 16; // 0b00010000
+        let new_value = 15; // 0b00001111
+        
+        assert!(CPU::check_for_half_carry_u8(old_value, new_value));
+    }
+
+    #[test]
+    fn check_for_half_carry_u16_carry() {
+        let old_value = 255; // 0b0000000011111111
+        let new_value = 256; // 0b0000000100000000
+        
+        assert!(CPU::check_for_half_carry_u16(old_value, new_value));
+    }
+
+    #[test]
+    fn check_for_half_carry_u16_borrow() {
+        let old_value = 256; // 0b0000000100000000
+        let new_value = 255; // 0b0000000011111111
+        
+        assert!(CPU::check_for_half_carry_u16(old_value, new_value));
     }
 }
 
