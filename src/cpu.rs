@@ -328,6 +328,7 @@ impl CPU {
 mod tests {
     use super::*;
 
+    // ---- CPU INITIALIZATION TESTS ----
     #[test]
     fn initialize_registers_cgb() {
         let mut cpu = CPU::new(Rc::new(RefCell::new(Memory::new())));
@@ -352,6 +353,7 @@ mod tests {
         assert_eq!(cpu.registers, reg);
     }
 
+    // ---- REGISTERS AND FLAGS TESTS ----
     #[test]
     fn set_get_registers() {
         let mut cpu = CPU::new(Rc::new(RefCell::new(Memory::new())));
@@ -404,44 +406,58 @@ mod tests {
         assert_eq!(cpu.get_carry_bit(), 1);
     }
 
+    // ---- BINARY ARITHMETIC CARRY AND BORROW TESTS ----
+    // *** 8-bit arithmetic ***
+    // Half-carry tests 
+    // Case 1: Half carry occurs
     #[test]
-    fn check_for_half_carry_u8() {
-        // Case 1: Carry occurs
+    fn half_carry_u8_carry_occurs() {
         let mut operand1 = 0b1111; // 15
         let mut operand2 = 0b0100; // 8
-        assert!(CPU::check_for_half_carry_u8(operand1, operand2)); // Expecting true
-        
-        // Case 2: Carry does not occur
-        operand1 = 0b00001010; // 10
-        operand2 = 0b00000101; // 5
-        assert!(!CPU::check_for_half_carry_u8(operand1, operand2)) // Expecting false
+        assert!(CPU::check_for_half_carry_u8(operand1, operand2));
     }
-
+    
+    // Case 2: Half carry does not occur
     #[test]
-    fn check_for_borrow_u8() {
-        // Case 1: Borrow occurs
-        let mut operand1 = 0b0001; // 1
-        let mut operand2 = 0b1111; // 15
-        assert!(CPU::check_for_borrow_u8(operand1, operand2)); // Expecting true
-
-        // Case 2: Borrow does not occur
-        operand1 = 0b1111; // 15
-        operand2 = 0b0001; // 1
-        assert!(!CPU::check_for_borrow_u8(operand1, operand2)); // Expecting false
-
+    fn half_carry_u8_no_carry() {
+        let operand1 = 0b00001010; // 10
+        let operand2 = 0b00000101; // 5
+        assert!(!CPU::check_for_half_carry_u8(operand1, operand2));
     }
 
+    // Borrow tests
+    // Case 1: Borrow occurs
+    #[test]
+    fn borrow_u8_borrow_occurs() {
+        // Case 1: Borrow occurs
+        let operand1 = 0b0001; // 1
+        let operand2 = 0b1111; // 15
+        assert!(CPU::check_for_borrow_u8(operand1, operand2));
+    }
+
+    // Case 2: Borrow does not occur
+    #[test]
+    fn borrow_u8_no_borrow() {
+        let operand1 = 0b1111; // 15
+        let operand2 = 0b0001; // 1
+        assert!(!CPU::check_for_borrow_u8(operand1, operand2));
+    }
+
+    // ** 16-bit arithmetic **
+    // Case 1: Half carry occurs
     #[test]
     fn check_for_half_carry_u16() {
-        // Case 1: Carry occurs
-        let mut operand1 = 0b111111111111;  // 4095
-        let mut operand2 = 0b100000000000;  // 2048
-        assert!(CPU::check_for_half_carry_u16(operand1, operand2)); // Expected to return true
+        let operand1 = 0b111111111111;  // 4095
+        let operand2 = 0b100000000000;  // 2048
+        assert!(CPU::check_for_half_carry_u16(operand1, operand2));
+    }
 
-        // Case 2: Carry does not occur
-        operand1 = 0b1000000000000000; // 4095
-        operand2 = 0b0100000000000000; // 2047
-        assert!(!CPU::check_for_half_carry_u16(operand1, operand2)); // Expected to return false
+    // Case 2: Half carry does not occur
+    #[test]
+    fn half_carry_u16() {
+        let operand1 = 0b1000000000000000; // 4095
+        let operand2 = 0b0100000000000000; // 2047
+        assert!(!CPU::check_for_half_carry_u16(operand1, operand2));
     }
 }
 

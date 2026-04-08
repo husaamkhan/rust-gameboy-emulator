@@ -58,6 +58,7 @@ mod tests {
         }
     }
 
+    // Case 1: Fetching from valid address
     #[test]
     fn fetch_byte_from_rom() {
         let mut memory = Memory::new();
@@ -68,12 +69,16 @@ mod tests {
         assert_eq!(memory.fetch_byte_from_rom(2), 3);
     }
 
+    // Case 2: Fetching from invalid memory address
     #[test]
     fn fetch_byte_from_rom_out_of_bounds() {
         let mut memory = Memory::new();
         memory.rom = vec![];
 
-        let result = std::panic::catch_unwind(|| memory.fetch_byte_from_rom(0));
+        // Attempting to fetch from empty memory should cause a panic
+        let result = std
+            ::panic
+            ::catch_unwind(|| memory.fetch_byte_from_rom(0));
         assert!(result.is_err());
     }
 
