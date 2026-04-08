@@ -207,8 +207,7 @@ impl CPU {
      * Checks if a 1 is carried from bit 3 to bit 4.
      */
     fn check_for_half_carry_u8(operand1: u8, operand2: u8) -> bool {
-        let HC = (((operand1 & 0xF) + (operand2 & 0xF)) & 0x10);
-        if HC == 0x10 {
+        if (((operand1 & 0xF) + (operand2 & 0xF)) & 0x10) == 0x10 {
             return true;
         }
 
