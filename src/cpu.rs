@@ -203,17 +203,24 @@ impl CPU {
     }
 
     /** 
-     * Used for 8-bit arithmetic instructions.
-     * In addition, checks if an overflow occured from bit 3 to bit 4.
-     * In subtracction, checks if a borrow occured from bit 4 into bit 3.
+     * Used for 8-bit addition.
+     * Checks if a 1 is carried from bit 3 to bit 4.
      */
-    fn check_for_half_carry_u8(old_value: u8, new_value: u8) -> bool {
-        // Gets the value stored in the lower nibble and checks if it crossed 16
-        let old_value_nibble = old_value & 0x0F;
-        let new_value_nibble = new_value & 0x0F;
+    fn check_for_half_carry_u8(operand1: u8, operand2: u8) -> bool {
+        let HC = (((operand1 & 0xF) + (operand2 & 0xF)) & 0x10);
+        if HC == 0x10 {
+            return true;
+        }
 
-        if old_value_nibble < HALF_CARRY_THRESHOLD_U8
-            && new_value_nibble == HALF_CARRY_THRESHOLD_U8 {
+        false
+    }
+
+    /**
+     * Used for 8-bit subtraction.
+     * Checks if the lower nibble of the calculated difference will be less than zero.
+     */
+    fn check_for_borrow_u8(operand1: u8, operand2: u8) -> bool {
+        if (operand1 & 0xF) < (operand2 & 0xF) {
             return true;
         }
 
@@ -221,17 +228,11 @@ impl CPU {
     }
 
     /** 
-     * Used for 16-bit arithmetic instructions.
-     * In addition, checks if an overflow occured from bit 11 to bit 12.
-     * In subtracction, checks if a borrow occured from bit 12 into bit 11.
+     * Used for 16-bit addition.
+     * Checks if a 1 is carried from bit 11 to 12
      */
-    fn check_for_half_carry_u16(old_value: u16, new_value: u16) -> bool {
-        // Gets the value stored in the lower nibble and checks if it crossed 16
-        let old_value_nibble = old_value & 0xFF;
-        let new_value_nibble = new_value & 0xFF;
-
-        if old_value_nibble < HALF_CARRY_THRESHOLD_U16
-            && new_value_nibble == HALF_CARRY_THRESHOLD_U16 {
+    fn check_for_half_carry_u16(operand1: u16, operand2: u16) -> bool {
+        if ((operand1 & 0xFFF) + (operand2 & 0xFFF)) as u32 & 0x1000 == 0x1000 {
             return true;
         }
 
@@ -404,35 +405,43 @@ mod tests {
     }
 
     #[test]
-    fn check_for_half_carry_u8_carry() {
-        let old_value = 15; // 0b00001111
-        let new_value = 16; // 0b00010000
+    fn check_for_half_carry_u8() {
+        // Case 1: Carry occurs
+        let mut operand1 = 0b1111; // 15
+        let mut operand2 = 0b0100; // 8
+        assert!(CPU::check_for_half_carry_u8(operand1, operand2)); // Expecting true
         
-        assert!(CPU::check_for_half_carry_u8(old_value, new_value));
+        // Case 2: Carry does not occur
+        operand1 = 0b00001010; // 10
+        operand2 = 0b00000101; // 5
+        assert!(!CPU::check_for_half_carry_u8(operand1, operand2)) // Expecting false
     }
 
     #[test]
-    fn check_for_half_carry_u8_borrow() {
-        let old_value = 16; // 0b00010000
-        let new_value = 15; // 0b00001111
-        
-        assert!(CPU::check_for_half_carry_u8(old_value, new_value));
+    fn check_for_borrow_u8() {
+        // Case 1: Borrow occurs
+        let mut operand1 = 0b0001; // 1
+        let mut operand2 = 0b1111; // 15
+        assert!(CPU::check_for_borrow_u8(operand1, operand2)); // Expecting true
+
+        // Case 2: Borrow does not occur
+        operand1 = 0b1111; // 15
+        operand2 = 0b0001; // 1
+        assert!(!CPU::check_for_borrow_u8(operand1, operand2)); // Expecting false
+
     }
 
     #[test]
-    fn check_for_half_carry_u16_carry() {
-        let old_value = 255; // 0b0000000011111111
-        let new_value = 256; // 0b0000000100000000
-        
-        assert!(CPU::check_for_half_carry_u16(old_value, new_value));
-    }
+    fn check_for_half_carry_u16() {
+        // Case 1: Carry occurs
+        let mut operand1 = 0b111111111111;  // 4095
+        let mut operand2 = 0b100000000000;  // 2048
+        assert!(CPU::check_for_half_carry_u16(operand1, operand2)); // Expected to return true
 
-    #[test]
-    fn check_for_half_carry_u16_borrow() {
-        let old_value = 256; // 0b0000000100000000
-        let new_value = 255; // 0b0000000011111111
-        
-        assert!(CPU::check_for_half_carry_u16(old_value, new_value));
+        // Case 2: Carry does not occur
+        operand1 = 0b1000000000000000; // 4095
+        operand2 = 0b0100000000000000; // 2047
+        assert!(!CPU::check_for_half_carry_u16(operand1, operand2)); // Expected to return false
     }
 }
 
